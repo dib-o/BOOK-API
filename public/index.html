@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bookstore Frontend</title>
+</head>
+<body>
+  <h1>📚 Bookstore</h1>
+
+  <form id="bookForm">
+    <input type="text" id="title" placeholder="Title" required />
+    <input type="text" id="author" placeholder="Author" required />
+    <button type="submit">Add Book</button>
+  </form>
+
+  <h2>All Books:</h2>
+  <ul id="bookList"></ul>
+
+  <script>
+    const bookList = document.getElementById('bookList');
+    const form = document.getElementById('bookForm');
+    const titleInput = document.getElementById('title');
+    const authorInput = document.getElementById('author');
+
+    // Load all books
+    function loadBooks() {
+      fetch('/books')
+        .then(res => res.json())
+        .then(data => {
+          bookList.innerHTML = '';
+          data.forEach(book => {
+            const li = document.createElement('li');
+            li.textContent = `${book.title} by ${book.author}`;
+            bookList.appendChild(li);
+          });
+        });
+    }
+
+    // Add book
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const book = {
+        title: titleInput.value,
+        author: authorInput.value
+      };
+
+      fetch('/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(book)
+      })
+      .then(() => {
+        titleInput.value = '';
+        authorInput.value = '';
+        loadBooks();
+      });
+    });
+
+    loadBooks();
+  </script>
+</body>
+</html>
